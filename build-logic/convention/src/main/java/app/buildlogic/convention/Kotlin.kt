@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal fun Project.configureKotlinAndroid(
-    commonExtension : CommonExtension<*,*,*,*,*>
-){
+    commonExtension: CommonExtension<*, *, *, *, *>,
+) {
     commonExtension.apply {
         compileSdk = libs.findVersion("projectCompileSdkVersion").get().toString().toInt()
         defaultConfig.minSdk = libs.findVersion("projectMinSdkVersion").get().toString().toInt()
@@ -29,7 +29,7 @@ internal fun Project.configureKotlinAndroid(
 }
 
 
-private fun Project.configureKotlin(){
+private fun Project.configureKotlin() {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)

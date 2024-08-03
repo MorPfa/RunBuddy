@@ -1,9 +1,8 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.runbuddy.android.application.compose)
     alias(libs.plugins.mapsplatform.secrets.plugin)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.runbuddy.android.application)
+
 
 
 }
@@ -17,10 +16,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-    }
-
-    buildFeatures {
-        compose = true
     }
 
     packaging {

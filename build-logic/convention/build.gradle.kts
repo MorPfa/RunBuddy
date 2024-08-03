@@ -20,5 +20,24 @@ gradlePlugin {
             id = "runbuddy.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
+
+        register("androidApplicationCompose"){
+            id = "runbuddy.android.application.compose"
+            implementationClass = "AndroidApplicationComposeConventionPlugin"
+        }
+
+        register("androidLibrary"){
+            id = "runbuddy.android.library"
+            implementationClass = "AndroidLibraryConventionPlugin"
+        }
+        register("androidLibraryCompose"){
+            id = "runbuddy.android.library.compose"
+            implementationClass = "AndroidLibraryComposeConventionPlugin"
+        }
+
+        register("androidFeatureUi"){
+            id = "runbuddy.android.feature.ui"
+            implementationClass = "AndroidFeatureUiConventionPlugin"
+        }
     }
 }

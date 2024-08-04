@@ -39,5 +39,18 @@ gradlePlugin {
             id = "runbuddy.android.feature.ui"
             implementationClass = "AndroidFeatureUiConventionPlugin"
         }
+
+        register("androidRoom"){
+            id = "runbuddy.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
+        }
+        register("jvmLibrary"){
+            id = "runbuddy.jvm.library"
+            implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("jvmKtor"){
+            id = "runbuddy.jvm.ktor"
+            implementationClass = "JvmKtorConventionPlugin"
+        }
     }
 }

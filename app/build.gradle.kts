@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.runbuddy.android.application.compose)
     alias(libs.plugins.mapsplatform.secrets.plugin)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.runbuddy.jvm.ktor)
 
 
 

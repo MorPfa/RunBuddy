@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.runbuddy.android.library.compose)
-
 }
 
 android {

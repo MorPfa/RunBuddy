@@ -15,6 +15,4 @@ dependencies {
     implementation(libs.google.maps.android.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.timber)
-    implementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.junit)
 }

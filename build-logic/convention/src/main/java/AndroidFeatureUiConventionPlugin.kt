@@ -6,7 +6,7 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidFeatureUiConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.run {
-            pluginManager.apply("runbuddy.android.application")
+            pluginManager.apply("runbuddy.android.library.compose")
             pluginManager.apply("org.jetbrains.kotlin.plugin.compose")
 
           dependencies{

@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.runbuddy.android.library)
+    alias(libs.plugins.runbuddy.jvm.ktor)
 }
 
 android {

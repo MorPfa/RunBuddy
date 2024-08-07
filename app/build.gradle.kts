@@ -9,7 +9,6 @@ plugins {
 
 android {
     namespace = "app.runbuddy"
-    compileSdk = 34
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

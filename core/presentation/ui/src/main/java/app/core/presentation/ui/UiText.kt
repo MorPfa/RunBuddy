@@ -19,7 +19,7 @@ sealed interface UiText {
         }
     }
 
-    @Composable
+
     fun asString(context: Context): String {
         return when (this) {
             is DynamicString -> value

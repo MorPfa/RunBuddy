@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import app.core.presentation.designsystem.RunBuddyTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,28 +23,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             RunBuddyTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    val navController = rememberNavController()
+                    NavigationRoot(navController = navController)
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RunBuddyTheme {
-        Greeting("Android")
-    }
-}

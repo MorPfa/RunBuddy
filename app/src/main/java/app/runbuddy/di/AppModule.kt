@@ -7,7 +7,6 @@ import androidx.security.crypto.MasterKey
 import app.runbuddy.MainViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModelOf
-import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val appModule = module {

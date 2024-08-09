@@ -21,7 +21,9 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 
-class HttpClientFactory(private val sessionStorage: SessionStorage) {
+class HttpClientFactory(
+    private val sessionStorage: SessionStorage
+) {
 
     fun build(): HttpClient {
         return HttpClient(CIO) {
@@ -49,7 +51,7 @@ class HttpClientFactory(private val sessionStorage: SessionStorage) {
                     loadTokens {
                         val info = sessionStorage.get()
                         BearerTokens(
-                            info?.accessToken ?: "",
+                            accessToken = info?.accessToken ?: "",
                             refreshToken = info?.refreshToken ?: ""
                         )
                     }
@@ -62,19 +64,24 @@ class HttpClientFactory(private val sessionStorage: SessionStorage) {
                                 userId = info?.userId ?: ""
                             )
                         )
-                        if (response is Result.Success) {
+
+                        if(response is Result.Success) {
                             val newAuthInfo = AuthInfo(
                                 accessToken = response.data.accessToken,
                                 refreshToken = info?.refreshToken ?: "",
                                 userId = info?.userId ?: ""
                             )
                             sessionStorage.set(newAuthInfo)
+
                             BearerTokens(
                                 accessToken = newAuthInfo.accessToken,
                                 refreshToken = newAuthInfo.refreshToken
                             )
                         } else {
-                            BearerTokens(accessToken = "", refreshToken = "")
+                            BearerTokens(
+                                accessToken = "",
+                                refreshToken = ""
+                            )
                         }
                     }
                 }

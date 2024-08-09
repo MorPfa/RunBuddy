@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
 import app.core.presentation.designsystem.RuniqueBlack
 import app.core.presentation.designsystem.RuniqueGray
 
+
 @Composable
 fun RunBuddyActionButton(
     text: String,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
@@ -37,10 +38,13 @@ fun RunBuddyActionButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContentColor = RuniqueGray,
-            disabledContainerColor = RuniqueBlack
-        ), shape = RoundedCornerShape(100f),
-        modifier = modifier.height(IntrinsicSize.Min)
+            disabledContainerColor = RuniqueGray,
+            disabledContentColor = RuniqueBlack
+
+        ),
+        shape = RoundedCornerShape(100f),
+        modifier = modifier
+            .height(IntrinsicSize.Min)
     ) {
         Box(
             modifier = Modifier
@@ -57,13 +61,14 @@ fun RunBuddyActionButton(
             )
             Text(
                 text = text,
-                modifier = Modifier.alpha(if (isLoading) 0f else 1f),
-                fontWeight = FontWeight.Medium
+                modifier = Modifier
+                    .alpha(if(isLoading) 0f else 1f),
+                fontWeight = FontWeight.Medium,
+                color = if (enabled) RuniqueGray else RuniqueBlack
             )
         }
     }
 }
-
 
 @Composable
 fun RunBuddyOutlinedActionButton(

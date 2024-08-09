@@ -41,7 +41,6 @@ import app.core.presentation.designsystem.EmailIcon
 import app.core.presentation.designsystem.Poppins
 import app.core.presentation.designsystem.RunBuddyTheme
 import app.core.presentation.designsystem.RuniqueDarkRed
-import app.core.presentation.designsystem.RuniqueGray
 import app.core.presentation.designsystem.RuniqueGreen
 import app.core.presentation.designsystem.components.GradientBackground
 import app.core.presentation.designsystem.components.RunBuddyActionButton
@@ -51,37 +50,51 @@ import app.core.presentation.ui.ObserveAsEvents
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RegisterScreenRoot(
+fun RegistrationScreenRoot(
     onSignInClick: () -> Unit,
     onSuccessfulRegistration: () -> Unit,
     viewModel: RegistrationViewModel = koinViewModel(),
 ) {
-
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    ObserveAsEvents(flow = viewModel.events) {event ->
-        when(event){
+    ObserveAsEvents(viewModel.events) { event ->
+        when(event) {
             is RegisterEvent.Error -> {
-                    keyboardController?.hide()
-                Toast.makeText(context, event.error.asString(context = context), Toast.LENGTH_SHORT).show()
+                keyboardController?.hide()
+                Toast.makeText(
+                    context,
+                    event.error.asString(context),
+                    Toast.LENGTH_LONG
+                ).show()
             }
             RegisterEvent.RegistrationSuccess -> {
                 keyboardController?.hide()
-                Toast.makeText(context,R.string.registration_successful, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    R.string.registration_successful,
+                    Toast.LENGTH_LONG
+                ).show()
+                onSuccessfulRegistration()
             }
         }
-        
     }
-    RegisterScreen(
+
+    RegistrationScreen(
         state = viewModel.state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when(action) {
+                is RegisterAction.OnLoginClick -> onSignInClick()
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
 @Composable
-private fun RegisterScreen(
+private fun RegistrationScreen(
     state: RegisterState,
-    onAction: (RegisterAction) -> Unit,
+    onAction: (RegisterAction) -> Unit
 ) {
     GradientBackground {
         Column(
@@ -100,7 +113,7 @@ private fun RegisterScreen(
                 withStyle(
                     style = SpanStyle(
                         fontFamily = Poppins,
-                        color = RuniqueGray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     append(stringResource(id = R.string.already_have_an_account) + " ")
@@ -203,7 +216,7 @@ private fun RegisterScreen(
 fun PasswordRequirement(
     text: String,
     isValid: Boolean,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
@@ -216,7 +229,7 @@ fun PasswordRequirement(
                 CrossIcon
             },
             contentDescription = null,
-            tint = if (isValid) RuniqueGreen else RuniqueDarkRed
+            tint = if(isValid) RuniqueGreen else RuniqueDarkRed
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
@@ -227,19 +240,14 @@ fun PasswordRequirement(
     }
 }
 
-
-
 @Preview
 @Composable
 private fun RegisterScreenPreview() {
     RunBuddyTheme {
-        RegisterScreen(
+        RegistrationScreen(
             state = RegisterState(
                 passwordValidationState = PasswordValidationState(
                     hasNumber = true,
-                    hasLowerCaseChar = true,
-                    hasMinLength = true,
-                    hasUpperCaseChar = true
                 )
             ),
             onAction = {}

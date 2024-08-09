@@ -48,7 +48,7 @@ import app.core.presentation.designsystem.RunBuddyTheme
 @Composable
 fun RunBuddyPasswordTextField(
     state: TextFieldState,
-    isPasswordVisible: Boolean = false,
+    isPasswordVisible: Boolean,
     onTogglePasswordVisibility: () -> Unit,
     hint: String,
     title: String?,
@@ -57,52 +57,78 @@ fun RunBuddyPasswordTextField(
     var isFocused by remember {
         mutableStateOf(false)
     }
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             if (title != null) {
-                Text(text = title, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
         BasicSecureTextField(
             state = state,
-            textObfuscationMode = if (isPasswordVisible) TextObfuscationMode.Visible else TextObfuscationMode.Hidden,
+            textObfuscationMode = if (isPasswordVisible) {
+                TextObfuscationMode.Visible
+            } else TextObfuscationMode.Hidden,
+            textStyle = LocalTextStyle.current.copy(
+                color = MaterialTheme.colorScheme.onBackground
+            ),
             keyboardType = KeyboardType.Password,
-            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onBackground),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
                 .background(
-                    if (isFocused) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surface
+                    if (isFocused) {
+                        MaterialTheme.colorScheme.primary.copy(
+                            alpha = 0.05f
+                        )
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    }
                 )
                 .border(
-                    width = 1.dp, color = if (isFocused)
+                    width = 1.dp,
+                    color = if (isFocused) {
                         MaterialTheme.colorScheme.primary
-                    else Color.Transparent, shape = RoundedCornerShape(16.dp)
+                    } else {
+                        Color.Transparent
+                    },
+                    shape = RoundedCornerShape(16.dp)
                 )
                 .padding(horizontal = 12.dp)
-                .onFocusChanged { isFocused = it.isFocused },
+                .onFocusChanged {
+                    isFocused = it.isFocused
+                },
             decorator = { innerBox ->
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Icon(
                         imageVector = LockIcon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-
-                    Box(modifier = Modifier.weight(1f)) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
                         if (state.text.isEmpty() && !isFocused) {
                             Text(
                                 text = hint,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                    alpha = 0.4f
+                                ),
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
@@ -110,19 +136,21 @@ fun RunBuddyPasswordTextField(
                     }
                     IconButton(onClick = onTogglePasswordVisibility) {
                         Icon(
-                            imageVector = if (!isPasswordVisible) EyeClosedIcon else EyeOpenedIcon,
-                            contentDescription = if (!isPasswordVisible) stringResource(id = R.string.show_password) else stringResource(
-                                id = R.string.hide_password
-                            ),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(end = 8.dp)
+                            imageVector = if (!isPasswordVisible) {
+                                EyeClosedIcon
+                            } else EyeOpenedIcon,
+                            contentDescription = if(isPasswordVisible) {
+                                stringResource(id = R.string.show_password)
+                            } else {
+                                stringResource(id = R.string.hide_password)
+                            },
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
         )
     }
-
 }
 
 

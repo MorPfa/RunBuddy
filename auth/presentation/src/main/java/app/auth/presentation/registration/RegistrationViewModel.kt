@@ -25,14 +25,14 @@ import kotlinx.coroutines.launch
 
 class RegistrationViewModel(
     private val userDataValidator: UserDataValidator,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+    private val repository: AuthRepository
+): ViewModel() {
 
     var state by mutableStateOf(RegisterState())
         private set
 
-    private val evenChannel = Channel<RegisterEvent>()
-    val events = evenChannel.receiveAsFlow()
+    private val eventChannel = Channel<RegisterEvent>()
+    val events = eventChannel.receiveAsFlow()
 
     init {
         state.email.textAsFlow()
@@ -48,8 +48,7 @@ class RegistrationViewModel(
 
         state.password.textAsFlow()
             .onEach { password ->
-                val passwordValidationState =
-                    userDataValidator.validatePassword(password.toString())
+                val passwordValidationState = userDataValidator.validatePassword(password.toString())
                 state = state.copy(
                     passwordValidationState = passwordValidationState,
                     canRegister = state.isEmailValid && passwordValidationState.isValidPassword
@@ -60,10 +59,12 @@ class RegistrationViewModel(
     }
 
     fun onAction(action: RegisterAction) {
-        when(action){
+        when(action) {
             RegisterAction.OnRegisterClick -> register()
             RegisterAction.OnTogglePasswordVisibilityClick -> {
-                state = state.copy(isPasswordVisible = !state.isPasswordVisible)
+                state = state.copy(
+                    isPasswordVisible = !state.isPasswordVisible
+                )
             }
             else -> Unit
         }
@@ -72,21 +73,24 @@ class RegistrationViewModel(
     private fun register() {
         viewModelScope.launch {
             state = state.copy(isRegistering = true)
-            val result = authRepository.register(
+            val result = repository.register(
                 email = state.email.text.toString().trim(),
                 password = state.password.text.toString()
             )
             state = state.copy(isRegistering = false)
-            when(result){
+
+            when(result) {
                 is Result.Error -> {
-                    if(result.error == DataError.Network.CONFLICT){
-                        evenChannel.send(RegisterEvent.Error(UiText.StringResource(R.string.error_email_exists)))
-                    }else {
-                        evenChannel.send(RegisterEvent.Error(result.error.asUiText()))
+                    if(result.error == DataError.Network.CONFLICT) {
+                        eventChannel.send(RegisterEvent.Error(
+                            UiText.StringResource(R.string.error_email_exists)
+                        ))
+                    } else {
+                        eventChannel.send(RegisterEvent.Error(result.error.asUiText()))
                     }
                 }
                 is Result.Success -> {
-                    evenChannel.send(RegisterEvent.RegistrationSuccess)
+                    eventChannel.send(RegisterEvent.RegistrationSuccess)
                 }
             }
         }

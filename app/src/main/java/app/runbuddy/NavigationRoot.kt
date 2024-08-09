@@ -1,34 +1,49 @@
 package app.runbuddy
 
+
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
-
-
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import app.auth.presentation.intro.IntroScreenRoot
-import app.auth.presentation.registration.RegisterScreenRoot
+
+import app.auth.presentation.registration.RegistrationScreenRoot
+import app.auth.presentation.login.LoginScreenRoot
 
 @Composable
-fun NavigationRoot(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "auth") {
+fun NavigationRoot(
+    navController: NavHostController,
+    isLoggedIn: Boolean,
+) {
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) "run" else "auth"
+    ) {
         authGraph(navController)
+        runGraph(navController)
     }
 }
 
-
 private fun NavGraphBuilder.authGraph(navController: NavHostController) {
-    navigation(startDestination = "intro", route = "auth") {
+    navigation(
+        startDestination = "intro",
+        route = "auth"
+    ) {
         composable(route = "intro") {
             IntroScreenRoot(
-                onSignUpClick = { navController.navigate("register") },
-                onSignInClick = { navController.navigate("login") })
+                onSignUpClick = {
+                    navController.navigate("register")
+                },
+                onSignInClick = {
+                    navController.navigate("login")
+                }
+            )
         }
         composable(route = "register") {
-            RegisterScreenRoot(
+            RegistrationScreenRoot(
                 onSignInClick = {
                     navController.navigate("login") {
                         popUpTo("register") {
@@ -43,8 +58,33 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 }
             )
         }
-        composable("login"){
-            Text(text = "Login")
+        composable("login") {
+            LoginScreenRoot(
+                onLoginSuccess = {
+                    navController.navigate("run") {
+                        popUpTo("auth") {
+                            inclusive = true
+                        }
+                    }
+                },
+                onSignUpClick = {
+                    navController.navigate("register") {
+                        popUpTo("login") {
+                            inclusive = true
+                            saveState = true
+                        }
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+private fun NavGraphBuilder.runGraph(navController: NavHostController) {
+    navigation(startDestination = "run_overview", route = "run") {
+        composable("run_overview") {
+            Text(text = "Run overview")
         }
     }
 }

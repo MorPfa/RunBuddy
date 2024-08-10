@@ -12,6 +12,7 @@ import app.auth.presentation.intro.IntroScreenRoot
 
 import app.auth.presentation.registration.RegistrationScreenRoot
 import app.auth.presentation.login.LoginScreenRoot
+import app.run.presentation.run_overview.RunOverviewScreenRoot
 
 @Composable
 fun NavigationRoot(
@@ -84,7 +85,7 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 private fun NavGraphBuilder.runGraph(navController: NavHostController) {
     navigation(startDestination = "run_overview", route = "run") {
         composable("run_overview") {
-            Text(text = "Run overview")
+            RunOverviewScreenRoot()
         }
     }
 }

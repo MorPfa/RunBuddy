@@ -4,6 +4,7 @@ import android.app.Application
 import app.auth.data.di.authDataModule
 import app.auth.presentation.di.authViewModelModule
 import app.core.data.di.coreDataModule
+import app.run.presentation.di.runViewModelModule
 import app.runbuddy.di.appModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -24,7 +25,8 @@ class RunBuddyApp : Application() {
                 authDataModule,
                 authViewModelModule,
                 appModule,
-                coreDataModule
+                coreDataModule,
+                runViewModelModule
             )
         }
     }

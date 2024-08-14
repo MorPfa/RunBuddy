@@ -35,6 +35,7 @@ fun RunBuddyTheme(
         SideEffect {
             val window = (view.context as Activity).window
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            window.navigationBarColor = Color.Black.toArgb()
         }
     }
     MaterialTheme(

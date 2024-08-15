@@ -33,6 +33,7 @@ import app.core.presentation.designsystem.components.RunBuddyScaffold
 import app.core.presentation.designsystem.components.RunBuddyToolbar
 import app.run.presentation.R
 import app.run.presentation.active_run.components.RunDataCard
+import app.run.presentation.active_run.maps.TrackerMap
 import app.run.presentation.util.hasLocationPermission
 import app.run.presentation.util.hasNotificationPermission
 import app.run.presentation.util.shouldShowLocationPermissionRationale
@@ -53,7 +54,7 @@ fun ActiveRunScreenRoot(
 @Composable
 private fun ActiveRunScreen(
     state: ActiveRunState,
-    onAction: (ActiveRunAction) -> Unit
+    onAction: (ActiveRunAction) -> Unit,
 ) {
     val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -101,7 +102,7 @@ private fun ActiveRunScreen(
             )
         )
 
-        if(!showLocationRationale && !showNotificationRationale) {
+        if (!showLocationRationale && !showNotificationRationale) {
             permissionLauncher.requestRunBuddyPermissions(context)
         }
     }
@@ -141,6 +142,13 @@ private fun ActiveRunScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
+            TrackerMap(
+                isRunFinished = state.isRunFinished,
+                currentLocation = state.currentLocation,
+                locations = state.runData.locations,
+                onSnapShot = {},
+                modifier = Modifier.fillMaxSize()
+            )
             RunDataCard(
                 elapsedTime = state.elapsedTime,
                 runData = state.runData,
@@ -160,9 +168,11 @@ private fun ActiveRunScreen(
                 state.showLocationRationale && state.showNotificationRationale -> {
                     stringResource(id = R.string.location_rationale)
                 }
+
                 state.showLocationRationale -> {
                     stringResource(id = R.string.location_rationale)
                 }
+
                 else -> {
                     stringResource(id = R.string.notification_rationale)
                 }
@@ -182,7 +192,7 @@ private fun ActiveRunScreen(
 }
 
 private fun ActivityResultLauncher<Array<String>>.requestRunBuddyPermissions(
-    context: Context
+    context: Context,
 ) {
     val hasLocationPermission = context.hasLocationPermission()
     val hasNotificationPermission = context.hasNotificationPermission()
@@ -191,7 +201,7 @@ private fun ActivityResultLauncher<Array<String>>.requestRunBuddyPermissions(
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION,
     )
-    val notificationPermission = if(Build.VERSION.SDK_INT >= 33) {
+    val notificationPermission = if (Build.VERSION.SDK_INT >= 33) {
         arrayOf(Manifest.permission.POST_NOTIFICATIONS)
     } else arrayOf()
 
@@ -199,6 +209,7 @@ private fun ActivityResultLauncher<Array<String>>.requestRunBuddyPermissions(
         !hasLocationPermission && !hasNotificationPermission -> {
             launch(locationPermissions + notificationPermission)
         }
+
         !hasLocationPermission -> launch(locationPermissions)
         !hasNotificationPermission -> launch(notificationPermission)
     }

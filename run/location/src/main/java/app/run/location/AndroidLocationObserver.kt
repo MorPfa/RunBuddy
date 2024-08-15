@@ -19,23 +19,26 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class AndroidLocationObserver(private val context: Context) : LocationObserver {
-
+class AndroidLocationObserver(
+    private val context: Context
+): LocationObserver {
 
     private val client = LocationServices.getFusedLocationProviderClient(context)
+
     override fun observeLocation(interval: Long): Flow<LocationWithAltitude> {
         return callbackFlow {
             val locationManager = context.getSystemService<LocationManager>()!!
             var isGpsEnabled = false
             var isNetworkEnabled = false
-            while (!isGpsEnabled && !isNetworkEnabled) {
+            while(!isGpsEnabled && !isNetworkEnabled) {
                 isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                isNetworkEnabled =
-                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-                if (!isGpsEnabled && !isNetworkEnabled) {
+                isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+
+                if(!isGpsEnabled && !isNetworkEnabled) {
                     delay(3000L)
                 }
             }
+
             if (ActivityCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_FINE_LOCATION
@@ -51,8 +54,10 @@ class AndroidLocationObserver(private val context: Context) : LocationObserver {
                         trySend(location.toLocationWithAltitude())
                     }
                 }
-                val request =
-                    LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, interval).build()
+
+                val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, interval)
+                    .build()
+
                 val locationCallback = object : LocationCallback() {
                     override fun onLocationResult(result: LocationResult) {
                         super.onLocationResult(result)
@@ -61,13 +66,13 @@ class AndroidLocationObserver(private val context: Context) : LocationObserver {
                         }
                     }
                 }
+
                 client.requestLocationUpdates(request, locationCallback, Looper.getMainLooper())
 
                 awaitClose {
                     client.removeLocationUpdates(locationCallback)
                 }
             }
-
         }
     }
 }

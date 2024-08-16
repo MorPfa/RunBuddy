@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import app.core.presentation.designsystem.RunBuddyTheme
 import app.core.presentation.designsystem.StartIcon
 import app.core.presentation.designsystem.StopIcon
+import app.core.presentation.designsystem.components.RunBuddyActionButton
 import app.core.presentation.designsystem.components.RunBuddyDialog
 import app.core.presentation.designsystem.components.RunBuddyFloatingActionButton
 import app.core.presentation.designsystem.components.RunBuddyOutlinedActionButton
@@ -34,6 +35,7 @@ import app.core.presentation.designsystem.components.RunBuddyToolbar
 import app.run.presentation.R
 import app.run.presentation.active_run.components.RunDataCard
 import app.run.presentation.active_run.maps.TrackerMap
+import app.run.presentation.active_run.service.ActiveRunService
 import app.run.presentation.util.hasLocationPermission
 import app.run.presentation.util.hasNotificationPermission
 import app.run.presentation.util.shouldShowLocationPermissionRationale
@@ -43,10 +45,12 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ActiveRunScreenRoot(
+    onServiceToggle : (isServiceRunning : Boolean) -> Unit,
     viewModel: ActiveRunViewModel = koinViewModel(),
 ) {
     ActiveRunScreen(
         state = viewModel.state,
+        onServiceToggle = onServiceToggle,
         onAction = viewModel::onAction
     )
 }
@@ -54,6 +58,7 @@ fun ActiveRunScreenRoot(
 @Composable
 private fun ActiveRunScreen(
     state: ActiveRunState,
+    onServiceToggle : (isServiceRunning : Boolean) -> Unit,
     onAction: (ActiveRunAction) -> Unit,
 ) {
     val context = LocalContext.current
@@ -104,6 +109,18 @@ private fun ActiveRunScreen(
 
         if (!showLocationRationale && !showNotificationRationale) {
             permissionLauncher.requestRunBuddyPermissions(context)
+        }
+    }
+
+    LaunchedEffect(key1 = state.isRunFinished) {
+        if(state.isRunFinished){
+            onServiceToggle(false)
+        }
+    }
+
+    LaunchedEffect(key1 = state.shouldTrack) {
+        if(context.hasLocationPermission() && state.shouldTrack && !ActiveRunService.isServiceActive){
+            onServiceToggle(true)
         }
     }
 
@@ -160,6 +177,31 @@ private fun ActiveRunScreen(
         }
     }
 
+
+    if (!state.shouldTrack && state.hasStartedRunning) {
+        RunBuddyDialog(
+            title = stringResource(id = R.string.run_paused),
+            onDismiss = { onAction(ActiveRunAction.OnResumeRunClick) },
+            description = stringResource(id = R.string.resume_or_finish_run),
+            primaryButton = {
+                RunBuddyActionButton(
+                    text = stringResource(id = R.string.resume),
+                    isLoading = false,
+                    onClick = { onAction(ActiveRunAction.OnResumeRunClick) },
+                    modifier = Modifier.weight(1f)
+                )
+            },
+            secondaryButton = {
+                RunBuddyOutlinedActionButton(
+                    text = stringResource(id = R.string.finish),
+                    isLoading = state.isSavingRun,
+                    onClick = {
+                        onAction(ActiveRunAction.OnFinishRunClick)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            })
+    }
     if (state.showLocationRationale || state.showNotificationRationale) {
         RunBuddyDialog(
             title = stringResource(id = R.string.permission_required),
@@ -185,6 +227,7 @@ private fun ActiveRunScreen(
                         onAction(ActiveRunAction.OnDismissRationaleDialog)
                         permissionLauncher.requestRunBuddyPermissions(context)
                     }
+
                 )
             }
         )
@@ -221,7 +264,8 @@ private fun ActiveRunScreenPreview() {
     RunBuddyTheme {
         ActiveRunScreen(
             state = ActiveRunState(),
-            onAction = {}
+            onAction = {},
+            onServiceToggle = {}
         )
     }
 }

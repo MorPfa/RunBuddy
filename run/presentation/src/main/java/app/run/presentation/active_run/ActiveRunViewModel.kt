@@ -7,6 +7,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.run.domain.RunningTracker
+import app.run.presentation.active_run.service.ActiveRunService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,10 +18,14 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 
 class ActiveRunViewModel(
-    private val runningTracker: RunningTracker
-): ViewModel() {
+    private val runningTracker: RunningTracker,
+) : ViewModel() {
 
-    var state by mutableStateOf(ActiveRunState())
+    var state by mutableStateOf(
+        ActiveRunState(
+            shouldTrack = ActiveRunService.isServiceActive && runningTracker.isTracking.value
+        )
+    )
         private set
 
     private val eventChannel = Channel<ActiveRunEvent>()
@@ -40,7 +45,7 @@ class ActiveRunViewModel(
     init {
         hasLocationPermission
             .onEach { hasPermission ->
-                if(hasPermission) {
+                if (hasPermission) {
                     runningTracker.startObservingLocation()
                 } else {
                     runningTracker.stopObservingLocation()
@@ -77,40 +82,52 @@ class ActiveRunViewModel(
     }
 
     fun onAction(action: ActiveRunAction) {
-        when(action) {
+        when (action) {
             ActiveRunAction.OnFinishRunClick -> {
 
             }
+
             ActiveRunAction.OnResumeRunClick -> {
                 state = state.copy(shouldTrack = true)
             }
+
             ActiveRunAction.OnBackClick -> {
                 state = state.copy(shouldTrack = false)
             }
+
             ActiveRunAction.OnToggleRunClick -> {
                 state = state.copy(
                     hasStartedRunning = true,
                     shouldTrack = !state.shouldTrack
                 )
             }
+
             is ActiveRunAction.SubmitLocationPermissionInfo -> {
                 hasLocationPermission.value = action.acceptedLocationPermission
                 state = state.copy(
                     showLocationRationale = action.showLocationRationale
                 )
             }
+
             is ActiveRunAction.SubmitNotificationPermissionInfo -> {
                 state = state.copy(
                     showNotificationRationale = action.showNotificationRationale
                 )
             }
+
             is ActiveRunAction.OnDismissRationaleDialog -> {
                 state = state.copy(
                     showNotificationRationale = false,
                     showLocationRationale = false
                 )
             }
-            else -> Unit
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (!ActiveRunService.isServiceActive) {
+            runningTracker.stopObservingLocation()
         }
     }
 }

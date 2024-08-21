@@ -114,6 +114,13 @@ class RunningTracker(
             .launchIn(applicationScope)
     }
 
+
+    fun finishRun(){
+        stopObservingLocation()
+        setIsTracking(false)
+        _elapsedTime.value = Duration.ZERO
+        _runData.value = RunData()
+    }
     fun setIsTracking(isTracking: Boolean) {
         this._isTracking.value = isTracking
     }

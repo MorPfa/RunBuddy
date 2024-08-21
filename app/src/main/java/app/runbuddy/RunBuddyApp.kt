@@ -4,6 +4,7 @@ import android.app.Application
 import app.auth.data.di.authDataModule
 import app.auth.presentation.di.authViewModelModule
 import app.core.data.di.coreDataModule
+import app.core.database.di.databaseModule
 import app.run.location.di.locationModule
 import app.run.presentation.di.runPresentationModule
 import app.runbuddy.di.appModule
@@ -32,7 +33,8 @@ class RunBuddyApp : Application() {
                 appModule,
                 coreDataModule,
                 runPresentationModule,
-                locationModule
+                locationModule,
+                databaseModule
             )
         }
     }

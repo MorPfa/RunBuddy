@@ -50,7 +50,7 @@ fun RunBuddyToolbar(
     menuItems: List<DropDownItem> = emptyList(),
     onMenuItemClick: (Int) -> Unit = {},
     onBackClick: () -> Unit = {},
-    scrollBehaviour: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+    scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
     startContent: (@Composable () -> Unit)? = null,
 ) {
 
@@ -72,7 +72,7 @@ fun RunBuddyToolbar(
             }
         },
         modifier = modifier,
-        scrollBehavior = scrollBehaviour,
+        scrollBehavior = scrollBehavior,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent
         ),

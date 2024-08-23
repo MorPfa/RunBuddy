@@ -53,7 +53,7 @@ fun TrackerMap(
     isRunFinished: Boolean,
     currentLocation: Location?,
     locations: List<List<LocationTimestamp>>,
-    onSnapShot: (Bitmap) -> Unit,
+    onSnapshot: (Bitmap) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -141,7 +141,7 @@ fun TrackerMap(
                     createSnapshotJob = GlobalScope.launch {
                         //Delay ensures the map is sharp and focused before taking screenshot
                         delay(500L)
-                        map.awaitSnapshot()?.let(onSnapShot)
+                        map.awaitSnapshot()?.let(onSnapshot)
                     }
                 }
             }

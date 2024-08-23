@@ -6,6 +6,7 @@ import app.auth.presentation.di.authViewModelModule
 import app.core.data.di.coreDataModule
 import app.core.database.di.databaseModule
 import app.run.location.di.locationModule
+import app.run.network.di.networkModule
 import app.run.presentation.di.runPresentationModule
 import app.runbuddy.di.appModule
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,8 @@ class RunBuddyApp : Application() {
                 coreDataModule,
                 runPresentationModule,
                 locationModule,
-                databaseModule
+                databaseModule,
+                networkModule
             )
         }
     }

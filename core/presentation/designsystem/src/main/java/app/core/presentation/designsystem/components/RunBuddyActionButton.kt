@@ -30,7 +30,7 @@ fun RunBuddyActionButton(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
@@ -62,7 +62,7 @@ fun RunBuddyActionButton(
             Text(
                 text = text,
                 modifier = Modifier
-                    .alpha(if(isLoading) 0f else 1f),
+                    .alpha(if (isLoading) 0f else 1f),
                 fontWeight = FontWeight.Medium,
                 color = if (enabled) RuniqueGray else RuniqueBlack
             )
@@ -83,9 +83,14 @@ fun RunBuddyOutlinedActionButton(
         enabled = enabled,
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.onBackground,
-        ), shape = RoundedCornerShape(100f),
-        border = BorderStroke(width = 0.5.dp, color = MaterialTheme.colorScheme.onBackground),
-        modifier = modifier.height(IntrinsicSize.Min)
+        ),
+        border = BorderStroke(
+            width = 0.5.dp,
+            color = MaterialTheme.colorScheme.onBackground
+        ),
+        shape = RoundedCornerShape(100f),
+        modifier = modifier
+            .height(IntrinsicSize.Min)
     ) {
         Box(
             modifier = Modifier
@@ -96,17 +101,16 @@ fun RunBuddyOutlinedActionButton(
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(15.dp)
-                    .alpha(if (isLoading) 0f else 1f),
+                    .alpha(if (isLoading) 1f else 0f),
                 strokeWidth = 1.5.dp,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = text,
-                modifier = Modifier.alpha(if (isLoading) 0f else 1f),
+                modifier = Modifier
+                    .alpha(if (isLoading) 0f else 1f),
                 fontWeight = FontWeight.Medium
             )
         }
-
-
     }
 }

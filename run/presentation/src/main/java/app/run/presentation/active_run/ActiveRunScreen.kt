@@ -6,6 +6,7 @@ import android.Manifest
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -33,6 +34,7 @@ import app.core.presentation.designsystem.components.RunBuddyFloatingActionButto
 import app.core.presentation.designsystem.components.RunBuddyOutlinedActionButton
 import app.core.presentation.designsystem.components.RunBuddyScaffold
 import app.core.presentation.designsystem.components.RunBuddyToolbar
+import app.core.presentation.ui.ObserveAsEvents
 import app.run.presentation.R
 import app.run.presentation.active_run.components.RunDataCard
 import app.run.presentation.active_run.maps.TrackerMap
@@ -47,13 +49,38 @@ import java.io.ByteArrayOutputStream
 
 @Composable
 fun ActiveRunScreenRoot(
+    onFinish: () -> Unit,
+    onBack: () -> Unit,
     onServiceToggle: (isServiceRunning: Boolean) -> Unit,
     viewModel: ActiveRunViewModel = koinViewModel(),
 ) {
+    val context = LocalContext.current
+    ObserveAsEvents(flow = viewModel.events) { event ->
+        when(event) {
+            is ActiveRunEvent.Error -> {
+                Toast.makeText(
+                    context,
+                    event.error.asString(context),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            ActiveRunEvent.RunSaved -> onFinish()
+        }
+    }
     ActiveRunScreen(
         state = viewModel.state,
         onServiceToggle = onServiceToggle,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when(action) {
+                is ActiveRunAction.OnBackClick -> {
+                    if(!viewModel.state.hasStartedRunning) {
+                        onBack()
+                    }
+                }
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
@@ -61,7 +88,7 @@ fun ActiveRunScreenRoot(
 private fun ActiveRunScreen(
     state: ActiveRunState,
     onServiceToggle: (isServiceRunning: Boolean) -> Unit,
-    onAction: (ActiveRunAction) -> Unit,
+    onAction: (ActiveRunAction) -> Unit
 ) {
     val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -165,14 +192,19 @@ private fun ActiveRunScreen(
                 isRunFinished = state.isRunFinished,
                 currentLocation = state.currentLocation,
                 locations = state.runData.locations,
-                onSnapShot = { bitmap ->
+                onSnapshot = { bmp ->
                     val stream = ByteArrayOutputStream()
                     stream.use {
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, it)
+                        bmp.compress(
+                            Bitmap.CompressFormat.JPEG,
+                            80,
+                            it
+                        )
                     }
                     onAction(ActiveRunAction.OnRunProcessed(stream.toByteArray()))
                 },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
             )
             RunDataCard(
                 elapsedTime = state.elapsedTime,
@@ -185,17 +217,20 @@ private fun ActiveRunScreen(
         }
     }
 
-
     if (!state.shouldTrack && state.hasStartedRunning) {
         RunBuddyDialog(
             title = stringResource(id = R.string.run_paused),
-            onDismiss = { onAction(ActiveRunAction.OnResumeRunClick) },
+            onDismiss = {
+                onAction(ActiveRunAction.OnResumeRunClick)
+            },
             description = stringResource(id = R.string.resume_or_finish_run),
             primaryButton = {
                 RunBuddyActionButton(
                     text = stringResource(id = R.string.resume),
                     isLoading = false,
-                    onClick = { onAction(ActiveRunAction.OnResumeRunClick) },
+                    onClick = {
+                        onAction(ActiveRunAction.OnResumeRunClick)
+                    },
                     modifier = Modifier.weight(1f)
                 )
             },
@@ -208,15 +243,17 @@ private fun ActiveRunScreen(
                     },
                     modifier = Modifier.weight(1f)
                 )
-            })
+            }
+        )
     }
+
     if (state.showLocationRationale || state.showNotificationRationale) {
         RunBuddyDialog(
             title = stringResource(id = R.string.permission_required),
             onDismiss = { /* Normal dismissing not allowed for permissions */ },
             description = when {
                 state.showLocationRationale && state.showNotificationRationale -> {
-                    stringResource(id = R.string.location_rationale)
+                    stringResource(id = R.string.location_notification_rationale)
                 }
 
                 state.showLocationRationale -> {
@@ -234,8 +271,7 @@ private fun ActiveRunScreen(
                     onClick = {
                         onAction(ActiveRunAction.OnDismissRationaleDialog)
                         permissionLauncher.requestRunBuddyPermissions(context)
-                    }
-
+                    },
                 )
             }
         )
@@ -243,7 +279,7 @@ private fun ActiveRunScreen(
 }
 
 private fun ActivityResultLauncher<Array<String>>.requestRunBuddyPermissions(
-    context: Context,
+    context: Context
 ) {
     val hasLocationPermission = context.hasLocationPermission()
     val hasNotificationPermission = context.hasNotificationPermission()
@@ -272,8 +308,8 @@ private fun ActiveRunScreenPreview() {
     RunBuddyTheme {
         ActiveRunScreen(
             state = ActiveRunState(),
-            onAction = {},
-            onServiceToggle = {}
+            onServiceToggle = {},
+            onAction = {}
         )
     }
 }

@@ -30,6 +30,6 @@ interface RunPendingSyncDao {
     @Upsert
     suspend fun upsertDeletedRunSyncEntity(entity: DeletedRunSyncEntity)
 
-    @Query("DELETE FROM deleted_runs WHERE runID = :runId")
+    @Query("DELETE FROM deleted_runs WHERE runId = :runId")
     suspend fun deleteDeletedRunSyncEntity(runId: String)
 }

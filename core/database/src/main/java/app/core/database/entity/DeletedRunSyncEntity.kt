@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "deleted_runs")
 data class DeletedRunSyncEntity(
     @PrimaryKey(autoGenerate = false)
-    val runID: String,
+    val runId: String,
     val userId: String,
 )

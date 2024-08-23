@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "cb3b5f8fc7b49a39315e109b6a5fa1af",
+    "identityHash": "0404ccb8eebfec652772746d8973601d",
     "entities": [
       {
         "tableName": "runs",
@@ -172,11 +172,11 @@
       },
       {
         "tableName": "deleted_runs",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`runID` TEXT NOT NULL, `userId` TEXT NOT NULL, PRIMARY KEY(`runID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`runId` TEXT NOT NULL, `userId` TEXT NOT NULL, PRIMARY KEY(`runId`))",
         "fields": [
           {
-            "fieldPath": "runID",
-            "columnName": "runID",
+            "fieldPath": "runId",
+            "columnName": "runId",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -190,7 +190,7 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "runID"
+            "runId"
           ]
         },
         "indices": [],
@@ -200,7 +200,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cb3b5f8fc7b49a39315e109b6a5fa1af')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0404ccb8eebfec652772746d8973601d')"
     ]
   }
 }

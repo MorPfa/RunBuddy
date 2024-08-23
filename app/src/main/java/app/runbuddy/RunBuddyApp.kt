@@ -5,6 +5,7 @@ import app.auth.data.di.authDataModule
 import app.auth.presentation.di.authViewModelModule
 import app.core.data.di.coreDataModule
 import app.core.database.di.databaseModule
+import app.run.data.di.runDataModule
 import app.run.location.di.locationModule
 import app.run.network.di.networkModule
 import app.run.presentation.di.runPresentationModule
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
@@ -28,6 +30,7 @@ class RunBuddyApp : Application() {
         startKoin {
             androidLogger()
             androidContext(this@RunBuddyApp)
+            workManagerFactory()
             modules(
                 authDataModule,
                 authViewModelModule,
@@ -36,7 +39,8 @@ class RunBuddyApp : Application() {
                 runPresentationModule,
                 locationModule,
                 databaseModule,
-                networkModule
+                networkModule,
+                runDataModule
             )
         }
     }

@@ -71,7 +71,6 @@ class RunRepositoryImpl(
     override suspend fun deleteRun(id: RunId) {
         localRunDatasource.deleteRun(id)
 
-
         // Edge case where run is created in offline-mode,
         // and deleted in offline mode as well in which case
         // we don't need to sync anything

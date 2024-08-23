@@ -29,7 +29,7 @@ class RunOverviewViewModel(private val runRepository: RunRepository) : ViewModel
     }
 
     fun onAction(action: RunOverviewAction) {
-        when(action) {
+        when (action) {
             RunOverviewAction.OnLogoutClick -> Unit
             RunOverviewAction.OnStartClick -> Unit
             is RunOverviewAction.DeleteRun -> {
@@ -37,6 +37,7 @@ class RunOverviewViewModel(private val runRepository: RunRepository) : ViewModel
                     runRepository.deleteRun(action.runUi.id)
                 }
             }
+
             else -> Unit
         }
     }

@@ -2,5 +2,6 @@ package app.buildlogic.convention
 
 enum class ExtensionType {
     APPLICATION,
-    LIBRARY
+    LIBRARY,
+    DYNAMIC_FEATURE
 }

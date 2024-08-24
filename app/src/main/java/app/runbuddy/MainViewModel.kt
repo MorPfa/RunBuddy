@@ -9,8 +9,8 @@ import app.core.domain.SessionStorage
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val sessionStorage: SessionStorage
-): ViewModel() {
+    private val sessionStorage: SessionStorage,
+) : ViewModel() {
 
     var state by mutableStateOf(MainState())
         private set
@@ -23,5 +23,9 @@ class MainViewModel(
             )
             state = state.copy(isCheckingAuth = false)
         }
+    }
+
+    fun setAnalyticsDialogVisibility(isVisible: Boolean) {
+        state = state.copy(showAnalyticsInstallDialog = isVisible)
     }
 }

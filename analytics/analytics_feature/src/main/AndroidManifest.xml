@@ -10,4 +10,15 @@
         </dist:delivery>
         <dist:fusing dist:include="true" />
     </dist:module>
+
+    <application android:icon="@drawable/logo">
+        <activity
+            android:name=".AnalyticsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.RunBuddy">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>

@@ -18,6 +18,7 @@ import app.run.presentation.run_overview.RunOverviewScreenRoot
 
 @Composable
 fun NavigationRoot(
+    onAnalyticsClick: () -> Unit,
     navController: NavHostController,
     isLoggedIn: Boolean,
 ) {
@@ -26,7 +27,7 @@ fun NavigationRoot(
         startDestination = if (isLoggedIn) "run" else "auth"
     ) {
         authGraph(navController)
-        runGraph(navController)
+        runGraph(navController = navController, onAnalyticsClick = onAnalyticsClick)
     }
 }
 
@@ -84,10 +85,14 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
     }
 }
 
-private fun NavGraphBuilder.runGraph(navController: NavHostController) {
+private fun NavGraphBuilder.runGraph(
+    navController: NavHostController,
+    onAnalyticsClick: () -> Unit
+) {
     navigation(startDestination = "run_overview", route = "run") {
         composable("run_overview") {
             RunOverviewScreenRoot(
+                onAnalyticsClick= onAnalyticsClick,
                 onStartRunClick = {
                     navController.navigate("active_run")
                 },

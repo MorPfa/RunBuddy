@@ -47,6 +47,7 @@ private fun AnalyticsDashboardScreen(
     onAction: (AnalyticsAction) -> Unit
 ) {
     RunBuddyScaffold(
+        withGradient = true,
         topAppBar = {
             RunBuddyToolbar(
                 showBackButton = true,

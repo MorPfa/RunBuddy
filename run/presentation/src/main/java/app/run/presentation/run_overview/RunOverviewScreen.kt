@@ -20,6 +20,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.core.domain.run.Run
 import app.core.presentation.designsystem.AnalyticsIcon
 import app.core.presentation.designsystem.LogoIcon
 import app.core.presentation.designsystem.LogoutIcon
@@ -37,12 +38,14 @@ import org.koin.androidx.compose.koinViewModel
 fun RunOverviewScreenRoot(
     onStartRunClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onAnalyticsClick: () -> Unit,
     viewModel: RunOverviewViewModel = koinViewModel(),
 ) {
     RunOverviewScreen(
         state = viewModel.state,
         onAction = { action ->
             when(action) {
+                RunOverviewAction.OnAnalyticsClick -> onAnalyticsClick()
                 RunOverviewAction.OnStartClick -> onStartRunClick()
                 RunOverviewAction .OnLogoutClick -> onLogoutClick()
                 else -> Unit
@@ -62,6 +65,7 @@ private fun RunOverviewScreen(
         state = topAppBarState
     )
     RunBuddyScaffold(
+        withGradient = true,
         topAppBar = {
             RunBuddyToolbar(
                 showBackButton = false,

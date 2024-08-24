@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.runbuddy.android.application.compose)
-    alias(libs.plugins.mapsplatform.secrets.plugin)
     alias(libs.plugins.runbuddy.jvm.ktor)
 
 
@@ -22,7 +21,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    dynamicFeatures += setOf(":analytics:analytics-feature")
+    dynamicFeatures += setOf(":analytics:analytics_feature")
 }
 
 dependencies {

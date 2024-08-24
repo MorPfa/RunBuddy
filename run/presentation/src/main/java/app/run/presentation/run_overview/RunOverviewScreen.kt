@@ -20,7 +20,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import app.core.domain.run.Run
 import app.core.presentation.designsystem.AnalyticsIcon
 import app.core.presentation.designsystem.LogoIcon
 import app.core.presentation.designsystem.LogoutIcon

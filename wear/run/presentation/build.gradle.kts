@@ -11,6 +11,7 @@ android {
 }
 
 dependencies {
+
     implementation(libs.androidx.wear.compose.foundation)
     implementation(libs.androidx.wear.compose.material)
     implementation(libs.androidx.wear.compose.ui.tooling)
@@ -26,6 +27,8 @@ dependencies {
 
     implementation(projects.core.presentation.designsystemWear)
     implementation(projects.core.presentation.ui)
+    implementation(projects.wear.run.domain)
+    implementation(projects.core.domain)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -9,5 +9,4 @@ sealed interface RegisterEvent {
 
     data class Error(val error : UiText) : RegisterEvent
 
-
 }

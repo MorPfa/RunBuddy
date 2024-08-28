@@ -4,7 +4,8 @@ import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import runbuddy.wear.run.presentation.di.runPresentationModule
+import runbuddy.wear.run.data.di.wearRunDataModule
+import runbuddy.wear.run.presentation.di.wearRunPresentationModule
 
 class RunBuddyApp: Application() {
 
@@ -14,7 +15,8 @@ class RunBuddyApp: Application() {
             androidLogger()
             androidContext(this@RunBuddyApp)
             modules(
-                runPresentationModule
+                wearRunPresentationModule,
+                wearRunDataModule
             )
         }
     }

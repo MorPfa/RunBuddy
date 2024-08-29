@@ -10,10 +10,13 @@ android {
 dependencies {
 
     implementation(libs.bundles.koin)
+    implementation(libs.timber)
+
+
     implementation(projects.core.domain)
     implementation(projects.core.database)
 
-    implementation(libs.timber)
+
     implementation(libs.androidx.espresso.core)
     implementation(libs.androidx.junit)
 }

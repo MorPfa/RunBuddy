@@ -13,27 +13,35 @@ import app.core.domain.util.Result
 import app.core.presentation.ui.asUiText
 import app.run.domain.LocationDataCalculator
 import app.run.domain.RunningTracker
+import app.run.domain.WatchConnector
 import app.run.presentation.active_run.service.ActiveRunService
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class ActiveRunViewModel(
     private val runningTracker: RunningTracker,
     private val runRepository: RunRepository,
+    private val watchConnector: WatchConnector,
 ) : ViewModel() {
-    var state by mutableStateOf(ActiveRunState(
-        shouldTrack = ActiveRunService.isServiceActive && runningTracker.isTracking.value,
-        hasStartedRunning = ActiveRunService.isServiceActive
-    ))
+
+    var state by mutableStateOf(
+        ActiveRunState(
+            shouldTrack = ActiveRunService.isServiceActive && runningTracker.isTracking.value,
+            hasStartedRunning = ActiveRunService.isServiceActive
+        )
+    )
         private set
 
     private val eventChannel = Channel<ActiveRunEvent>()
@@ -51,9 +59,16 @@ class ActiveRunViewModel(
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {
+        watchConnector
+            .connectedDevice
+            .filterNotNull()
+            .onEach {
+            Timber.d("New device detected ${it.displayName}")
+        }.launchIn(viewModelScope)
+
         hasLocationPermission
             .onEach { hasPermission ->
-                if(hasPermission) {
+                if (hasPermission) {
                     runningTracker.startObservingLocation()
                 } else {
                     runningTracker.stopObservingLocation()
@@ -90,42 +105,49 @@ class ActiveRunViewModel(
     }
 
     fun onAction(action: ActiveRunAction) {
-        when(action) {
+        when (action) {
             ActiveRunAction.OnFinishRunClick -> {
                 state = state.copy(
                     isRunFinished = true,
                     isSavingRun = true
                 )
             }
+
             ActiveRunAction.OnResumeRunClick -> {
                 state = state.copy(shouldTrack = true)
             }
+
             ActiveRunAction.OnBackClick -> {
                 state = state.copy(shouldTrack = false)
             }
+
             ActiveRunAction.OnToggleRunClick -> {
                 state = state.copy(
                     hasStartedRunning = true,
                     shouldTrack = !state.shouldTrack
                 )
             }
+
             is ActiveRunAction.SubmitLocationPermissionInfo -> {
                 hasLocationPermission.value = action.acceptedLocationPermission
                 state = state.copy(
                     showLocationRationale = action.showLocationRationale
                 )
             }
+
             is ActiveRunAction.SubmitNotificationPermissionInfo -> {
                 state = state.copy(
                     showNotificationRationale = action.showNotificationRationale
                 )
             }
+
             is ActiveRunAction.OnDismissRationaleDialog -> {
                 state = state.copy(
                     showNotificationRationale = false,
                     showLocationRationale = false
                 )
             }
+
             is ActiveRunAction.OnRunProcessed -> {
                 finishRun(action.mapPictureBytes)
             }
@@ -134,7 +156,7 @@ class ActiveRunViewModel(
 
     private fun finishRun(mapPictureBytes: ByteArray) {
         val locations = state.runData.locations
-        if(locations.isEmpty() || locations.first().size <= 1) {
+        if (locations.isEmpty() || locations.first().size <= 1) {
             state = state.copy(isSavingRun = false)
             return
         }
@@ -154,10 +176,11 @@ class ActiveRunViewModel(
 
             runningTracker.finishRun()
 
-            when(val result = runRepository.upsertRun(run, mapPictureBytes)) {
+            when (val result = runRepository.upsertRun(run, mapPictureBytes)) {
                 is Result.Error -> {
                     eventChannel.send(ActiveRunEvent.Error(result.error.asUiText()))
                 }
+
                 is Result.Success -> {
                     eventChannel.send(ActiveRunEvent.RunSaved)
                 }
@@ -169,7 +192,7 @@ class ActiveRunViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        if(!ActiveRunService.isServiceActive) {
+        if (!ActiveRunService.isServiceActive) {
             runningTracker.stopObservingLocation()
         }
     }

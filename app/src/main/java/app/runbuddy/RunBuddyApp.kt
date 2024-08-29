@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import app.auth.data.di.authDataModule
 import app.auth.presentation.di.authViewModelModule
+import app.core.connectivity.data.di.coreConnectivityDataModule
 import app.core.data.di.coreDataModule
 import app.core.database.di.databaseModule
 import app.run.data.di.runDataModule
@@ -43,7 +44,7 @@ class RunBuddyApp : Application() {
                 databaseModule,
                 networkModule,
                 runDataModule,
-
+                coreConnectivityDataModule
             )
         }
     }

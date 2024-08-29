@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -59,23 +58,24 @@ fun TrackerScreenRoot(
 @Composable
 private fun TrackerScreen(
     state: TrackerState,
-    onAction: (TrackerAction) -> Unit,
+    onAction: (TrackerAction) -> Unit
 ) {
-    val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
     ) { perms ->
         val hasBodySensorPermission = perms[Manifest.permission.BODY_SENSORS] == true
         onAction(TrackerAction.OnBodySensorPermissionResult(hasBodySensorPermission))
-
     }
+
+    val context = LocalContext.current
     LaunchedEffect(key1 = true) {
-        val hasBodySensorPermission =
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.BODY_SENSORS
-            ) == PackageManager.PERMISSION_GRANTED
-        val hasNotificationPermission = if (Build.VERSION.SDK_INT >= 33) {
+        val hasBodySensorPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.BODY_SENSORS
+        ) == PackageManager.PERMISSION_GRANTED
+        onAction(TrackerAction.OnBodySensorPermissionResult(hasBodySensorPermission))
+
+        val hasNotificationPermission = if(Build.VERSION.SDK_INT >= 33) {
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
@@ -83,15 +83,18 @@ private fun TrackerScreen(
         } else {
             true
         }
+
         val permissions = mutableListOf<String>()
-        if (!hasBodySensorPermission) {
+        if(!hasBodySensorPermission) {
             permissions.add(Manifest.permission.BODY_SENSORS)
         }
-        if (!hasNotificationPermission && Build.VERSION.SDK_INT >= 33) {
+        if(!hasNotificationPermission && Build.VERSION.SDK_INT >= 33) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
+
         permissionLauncher.launch(permissions.toTypedArray())
     }
+
     if (state.isConnectedPhoneNearby) {
         Column(
             modifier = Modifier
@@ -204,7 +207,7 @@ private fun TrackerScreen(
 fun ToggleRunButton(
     isRunActive: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     OutlinedIconButton(
         onClick = onClick,

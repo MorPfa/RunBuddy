@@ -22,8 +22,8 @@ import runbuddy.wear.run.domain.PhoneConnector
 class WatchToPhoneConnector(
     nodeDiscovery: NodeDiscovery,
     applicationScope: CoroutineScope,
-    private val messagingClient: MessagingClient,
-) : PhoneConnector {
+    private val messagingClient: MessagingClient
+): PhoneConnector {
 
     private val _connectedNode = MutableStateFlow<DeviceNode?>(null)
     override val connectedNode = _connectedNode.asStateFlow()
@@ -32,7 +32,7 @@ class WatchToPhoneConnector(
         .observeConnectedDevices(DeviceType.WATCH)
         .flatMapLatest { connectedNodes ->
             val node = connectedNodes.firstOrNull()
-            if (node != null && node.isNearby) {
+            if(node != null && node.isNearby) {
                 _connectedNode.value = node
                 messagingClient.connectToNode(node.id)
             } else flowOf()
@@ -41,7 +41,6 @@ class WatchToPhoneConnector(
             applicationScope,
             SharingStarted.Eagerly
         )
-
 
     override suspend fun sendActionToPhone(action: MessagingAction): EmptyResult<MessagingError> {
         return messagingClient.sendOrQueueAction(action)

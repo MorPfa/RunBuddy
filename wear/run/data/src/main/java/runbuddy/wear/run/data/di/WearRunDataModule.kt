@@ -8,8 +8,10 @@ import runbuddy.wear.run.data.HealthServiceExerciseTracker
 import runbuddy.wear.run.data.WatchToPhoneConnector
 import runbuddy.wear.run.domain.ExerciseTracker
 import runbuddy.wear.run.domain.PhoneConnector
+import runbuddy.wear.run.domain.RunningTracker
 
 val wearRunDataModule = module {
     singleOf(::HealthServiceExerciseTracker).bind<ExerciseTracker>()
     singleOf(::WatchToPhoneConnector).bind<PhoneConnector>()
+    singleOf(::RunningTracker)
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.core.presentation.designsystem.RunBuddyTheme
 import app.core.presentation.ui.formatted
+import app.core.presentation.ui.toFormattedHeartRate
 import app.core.presentation.ui.toFormattedKm
 import app.core.presentation.ui.toFormattedPace
 import app.run.domain.RunData
@@ -34,7 +35,7 @@ import kotlin.time.Duration.Companion.minutes
 fun RunDataCard(
     elapsedTime: Duration,
     runData: RunData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
@@ -62,6 +63,12 @@ fun RunDataCard(
                     .defaultMinSize(minWidth = 75.dp)
             )
             RunDataItem(
+                title = stringResource(id = R.string.heartRate),
+                value = runData.heartRates.lastOrNull().toFormattedHeartRate(),
+                modifier = Modifier
+                    .defaultMinSize(minWidth = 75.dp)
+            )
+            RunDataItem(
                 title = stringResource(id = R.string.pace),
                 value = elapsedTime.toFormattedPace(
                     distanceKm = (runData.distanceMeters / 1000.0)
@@ -78,7 +85,7 @@ private fun RunDataItem(
     title: String,
     value: String,
     modifier: Modifier = Modifier,
-    valueFontSize: TextUnit = 16.sp
+    valueFontSize: TextUnit = 16.sp,
 ) {
     Column(
         modifier = modifier,

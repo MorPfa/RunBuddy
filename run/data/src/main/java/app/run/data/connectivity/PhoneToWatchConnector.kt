@@ -26,8 +26,8 @@ import kotlinx.coroutines.flow.shareIn
 class PhoneToWatchConnector(
     nodeDiscovery: NodeDiscovery,
     applicationScope: CoroutineScope,
-    private val messagingClient: MessagingClient,
-) : WatchConnector {
+    private val messagingClient: MessagingClient
+): WatchConnector {
 
     private val _connectedNode = MutableStateFlow<DeviceNode?>(null)
     override val connectedDevice = _connectedNode.asStateFlow()
@@ -38,18 +38,17 @@ class PhoneToWatchConnector(
         .observeConnectedDevices(DeviceType.PHONE)
         .flatMapLatest { connectedDevices ->
             val node = connectedDevices.firstOrNull()
-            if (node != null && node.isNearby) {
+            if(node != null && node.isNearby) {
                 _connectedNode.value = node
                 messagingClient.connectToNode(node.id)
-            } else {
-                flowOf()
-            }.onEach { action ->
-                if (action == MessagingAction.ConnectionRequest) {
-                    if (isTrackable.value) {
-                        sendActionToWatch(MessagingAction.Trackable)
-                    } else {
-                        messagingClient.sendOrQueueAction(MessagingAction.Untrackable)
-                    }
+            } else flowOf()
+        }
+        .onEach { action ->
+            if(action == MessagingAction.ConnectionRequest) {
+                if(isTrackable.value) {
+                    sendActionToWatch(MessagingAction.Trackable)
+                } else {
+                    sendActionToWatch(MessagingAction.Untrackable)
                 }
             }
         }
@@ -64,12 +63,12 @@ class PhoneToWatchConnector(
             .flatMapLatest { isTrackable }
             .onEach { isTrackable ->
                 sendActionToWatch(MessagingAction.ConnectionRequest)
-                val action = if (isTrackable) {
+                val action = if(isTrackable) {
                     MessagingAction.Trackable
-                } else {
-                    MessagingAction.Untrackable
-                }
-            }.launchIn(applicationScope)
+                } else MessagingAction.Untrackable
+                sendActionToWatch(action)
+            }
+            .launchIn(applicationScope)
     }
 
     override suspend fun sendActionToWatch(action: MessagingAction): EmptyResult<MessagingError> {

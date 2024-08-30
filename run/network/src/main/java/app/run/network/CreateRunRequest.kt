@@ -2,6 +2,7 @@ package app.run.network
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class CreateRunRequest(
     val durationMillis: Long,
@@ -12,5 +13,7 @@ data class CreateRunRequest(
     val avgSpeedKmh: Double,
     val maxSpeedKmh: Double,
     val totalElevationMeters: Int,
-    val id: String,
+    val avgHeartRate: Int?,
+    val maxHeartRate: Int?,
+    val id: String
 )

@@ -3,6 +3,7 @@ package runbuddy.wear.run.presentation
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ import app.core.presentation.designsystem.FinishIcon
 import app.core.presentation.designsystem.PauseIcon
 import app.core.presentation.designsystem.StartIcon
 import app.core.presentation.designsystem_wear.RunBuddyTheme
+import app.core.presentation.ui.ObserveAsEvents
 import app.core.presentation.ui.formatted
 import app.core.presentation.ui.toFormattedHeartRate
 import app.core.presentation.ui.toFormattedKm
@@ -49,6 +51,22 @@ import runbuddy.wear.run.presentation.components.RunDataCard
 fun TrackerScreenRoot(
     viewModel: TrackerViewModel = koinViewModel(),
 ) {
+
+    val context = LocalContext.current
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is TrackerEvent.Error -> {
+                Toast.makeText(
+                    context,
+                    event.message.asString(context),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            TrackerEvent.RunFinished -> Unit
+        }
+
+    }
     TrackerScreen(
         state = viewModel.state,
         onAction = viewModel::onAction
@@ -58,7 +76,7 @@ fun TrackerScreenRoot(
 @Composable
 private fun TrackerScreen(
     state: TrackerState,
-    onAction: (TrackerAction) -> Unit
+    onAction: (TrackerAction) -> Unit,
 ) {
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -75,7 +93,7 @@ private fun TrackerScreen(
         ) == PackageManager.PERMISSION_GRANTED
         onAction(TrackerAction.OnBodySensorPermissionResult(hasBodySensorPermission))
 
-        val hasNotificationPermission = if(Build.VERSION.SDK_INT >= 33) {
+        val hasNotificationPermission = if (Build.VERSION.SDK_INT >= 33) {
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
@@ -85,10 +103,10 @@ private fun TrackerScreen(
         }
 
         val permissions = mutableListOf<String>()
-        if(!hasBodySensorPermission) {
+        if (!hasBodySensorPermission) {
             permissions.add(Manifest.permission.BODY_SENSORS)
         }
-        if(!hasNotificationPermission && Build.VERSION.SDK_INT >= 33) {
+        if (!hasNotificationPermission && Build.VERSION.SDK_INT >= 33) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
 
@@ -207,7 +225,7 @@ private fun TrackerScreen(
 fun ToggleRunButton(
     isRunActive: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     OutlinedIconButton(
         onClick = onClick,

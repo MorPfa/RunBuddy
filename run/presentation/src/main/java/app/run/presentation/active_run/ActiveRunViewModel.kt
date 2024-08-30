@@ -15,7 +15,7 @@ import app.core.presentation.ui.asUiText
 import app.run.domain.LocationDataCalculator
 import app.run.domain.RunningTracker
 import app.run.domain.WatchConnector
-import app.run.presentation.active_run.service.ActiveRunService
+import app.core.notification.service.ActiveRunService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,8 +38,8 @@ class ActiveRunViewModel(
 ): ViewModel() {
 
     var state by mutableStateOf(ActiveRunState(
-        shouldTrack = ActiveRunService.isServiceActive && runningTracker.isTracking.value,
-        hasStartedRunning = ActiveRunService.isServiceActive
+        shouldTrack = ActiveRunService.isServiceActive.value && runningTracker.isTracking.value,
+        hasStartedRunning = ActiveRunService.isServiceActive.value
     ))
         private set
 
@@ -159,7 +159,6 @@ class ActiveRunViewModel(
             is ActiveRunAction.OnRunProcessed -> {
                 finishRun(action.mapPictureBytes)
             }
-            else -> Unit
         }
     }
 
@@ -255,7 +254,7 @@ class ActiveRunViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        if(!ActiveRunService.isServiceActive) {
+        if(!ActiveRunService.isServiceActive.value) {
             applicationScope.launch {
                 watchConnector.sendActionToWatch(MessagingAction.Untrackable)
             }

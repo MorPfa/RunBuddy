@@ -13,7 +13,6 @@ import app.auth.presentation.intro.IntroScreenRoot
 import app.auth.presentation.login.LoginScreenRoot
 import app.auth.presentation.registration.RegistrationScreenRoot
 import app.run.presentation.active_run.ActiveRunScreenRoot
-import app.run.presentation.active_run.service.ActiveRunService
 import app.run.presentation.run_overview.RunOverviewScreenRoot
 
 @Composable
@@ -87,12 +86,12 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
 
 private fun NavGraphBuilder.runGraph(
     navController: NavHostController,
-    onAnalyticsClick: () -> Unit
+    onAnalyticsClick: () -> Unit,
 ) {
     navigation(startDestination = "run_overview", route = "run") {
         composable("run_overview") {
             RunOverviewScreenRoot(
-                onAnalyticsClick= onAnalyticsClick,
+                onAnalyticsClick = onAnalyticsClick,
                 onStartRunClick = {
                     navController.navigate("active_run")
                 },
@@ -113,14 +112,14 @@ private fun NavGraphBuilder.runGraph(
             ActiveRunScreenRoot(onServiceToggle = { shouldServiceRun ->
                 if (shouldServiceRun) {
                     context.startService(
-                        ActiveRunService.createStartIntent(
+                        app.core.notification.service.ActiveRunService.createStartIntent(
                             context = context,
                             activity = MainActivity::class.java
                         )
                     )
                 } else {
                     context.startService(
-                        ActiveRunService.createStopIntent(
+                        app.core.notification.service.ActiveRunService.createStopIntent(
                             context = context,
                         )
                     )

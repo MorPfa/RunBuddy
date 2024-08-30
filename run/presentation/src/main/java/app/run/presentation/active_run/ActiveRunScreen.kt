@@ -20,11 +20,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import app.core.notification.service.ActiveRunService
 import app.core.presentation.designsystem.RunBuddyTheme
 import app.core.presentation.designsystem.StartIcon
 import app.core.presentation.designsystem.StopIcon
@@ -38,7 +41,7 @@ import app.core.presentation.ui.ObserveAsEvents
 import app.run.presentation.R
 import app.run.presentation.active_run.components.RunDataCard
 import app.run.presentation.active_run.maps.TrackerMap
-import app.run.presentation.active_run.service.ActiveRunService
+
 import app.run.presentation.util.hasLocationPermission
 import app.run.presentation.util.hasNotificationPermission
 import app.run.presentation.util.shouldShowLocationPermissionRationale
@@ -146,9 +149,9 @@ private fun ActiveRunScreen(
             onServiceToggle(false)
         }
     }
-
+    val isServiceActive by ActiveRunService.isServiceActive.collectAsState()
     LaunchedEffect(key1 = state.shouldTrack) {
-        if (context.hasLocationPermission() && state.shouldTrack && !ActiveRunService.isServiceActive) {
+        if (context.hasLocationPermission() && state.shouldTrack && isServiceActive) {
             onServiceToggle(true)
         }
     }

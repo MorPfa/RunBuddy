@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.core.presentation.designsystemWear)
     implementation(projects.wear.run.presentation)
     implementation(projects.wear.run.data)
+    implementation(projects.core.notification)
 
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling)

@@ -20,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.material3.FilledTonalIconButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.IconButtonDefaults
@@ -35,6 +37,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.OutlinedIconButton
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
+import app.core.notification.service.ActiveRunService
 import app.core.presentation.designsystem.ExclamationMarkIcon
 import app.core.presentation.designsystem.FinishIcon
 import app.core.presentation.designsystem.PauseIcon
@@ -45,14 +48,23 @@ import app.core.presentation.ui.formatted
 import app.core.presentation.ui.toFormattedHeartRate
 import app.core.presentation.ui.toFormattedKm
 import org.koin.androidx.compose.koinViewModel
+import runbuddy.wear.run.presentation.ambient.AmbientObserver
+import runbuddy.wear.run.presentation.ambient.ambientMode
 import runbuddy.wear.run.presentation.components.RunDataCard
 
 @Composable
 fun TrackerScreenRoot(
+    onServiceToggle: (isServiceRunning: Boolean) -> Unit,
     viewModel: TrackerViewModel = koinViewModel(),
 ) {
-
     val context = LocalContext.current
+    val state = viewModel.state
+    val isServiceActive by ActiveRunService.isServiceActive.collectAsStateWithLifecycle()
+    LaunchedEffect(state.isRunActive, state.hasStartedRunning, isServiceActive) {
+        if (state.isRunActive && !isServiceActive) {
+            onServiceToggle(true)
+        }
+    }
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is TrackerEvent.Error -> {
@@ -63,9 +75,10 @@ fun TrackerScreenRoot(
                 ).show()
             }
 
-            TrackerEvent.RunFinished -> Unit
+            TrackerEvent.RunFinished -> {
+                onServiceToggle(false)
+            }
         }
-
     }
     TrackerScreen(
         state = viewModel.state,
@@ -76,7 +89,7 @@ fun TrackerScreenRoot(
 @Composable
 private fun TrackerScreen(
     state: TrackerState,
-    onAction: (TrackerAction) -> Unit,
+    onAction: (TrackerAction) -> Unit
 ) {
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -113,11 +126,21 @@ private fun TrackerScreen(
         permissionLauncher.launch(permissions.toTypedArray())
     }
 
+    AmbientObserver(
+        onEnterAmbient = {
+            onAction(TrackerAction.OnEnterAmbientMode(it.burnInProtectionRequired))
+        },
+        onExitAmbient = {
+            onAction(TrackerAction.OnExitAmbientMode)
+        }
+    )
+
     if (state.isConnectedPhoneNearby) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
+                .background(MaterialTheme.colorScheme.background)
+                .ambientMode(state.isAmbientMode, state.burnInProtectionRequired),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -225,7 +248,7 @@ private fun TrackerScreen(
 fun ToggleRunButton(
     isRunActive: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     OutlinedIconButton(
         onClick = onClick,

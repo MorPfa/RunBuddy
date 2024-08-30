@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.androidx.wear.compose.material)
     implementation(libs.androidx.wear.compose.ui.tooling)
     implementation(libs.play.services.wearable)
+    implementation(libs.androidx.wear)
 
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling)
@@ -30,6 +31,8 @@ dependencies {
     implementation(projects.wear.run.domain)
     implementation(projects.core.connectivity.domain)
     implementation(projects.core.domain)
+    implementation(projects.core.notification)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
